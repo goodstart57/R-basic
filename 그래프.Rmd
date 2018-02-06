@@ -1,0 +1,240 @@
+---
+title: "그래프"
+author: "이재서"
+date: "2016년 8월 3일"
+output: html_document
+---
+
+**인수**           | **설명**
+------|-------------------------
+main=""            | 제목설정
+sub=""             | 서브제목
+xlab="", ylab=""   | x,y제목
+ann=F              | x,y축 제목 제거
+tmag=2             | 제목등 문자의 확대율
+axes=F             | x,y축을 제거
+axis               | x,y축을 사용자 지정값으로 표시
+**그래프 타입선택**|　
+type="p"           |점 모양(default)
+"l"                | 선 모양
+"b"                | 점과 선 모양
+"c"                | b에서 점을 생략
+"o"                | 점과 선을 중첩
+"h"                | 각 점에서 x축까지의 수직선 그래프
+"s"                | 왼쪽값을 기초로 계단모양
+"S"                | 오른쪽값을 기초로 계단모양
+"n"                | 축만 그리고 그래프는 그리지 않음
+**선의 모양 선택** |　
+lty=0, "blank"     | 투명선
+lty=1, "solid"     | 실선
+lty=2, "dashed"    | 대쉬선
+lty=3, "dotted"    | 점선
+lty=4, "dotdash"   | 점선과 대쉬선
+lty=5, "longdash"  | 긴 대쉬선
+lty=6, "twodash"   | 2개의 대쉬선
+**색, 기호 등**    |　
+col=1, "blue"      | 기호의 색지정
+pch=0, "문자"      | 점의 모양을 지정
+bg="blue"          | 그래프의 배경색
+lwd="숫자"         | 선의 굵기
+cex="숫자"         | 점이나 문자의 굵기
+
+###　
+그래프
+```{r, warning=F}
+var1 <- c(1,2,3,4,5)
+plot(var1)
+
+x <- 1:3;y <- 3:1
+plot(x,y,xlim=c(1,10),ylim=c(1,5), xlab="X축 값", ylab="Y축 값", main="Plot Test")
+
+v1 <- c(100,130,120,160,150)
+plot(v1, type='o', col='red', ylim=c(0,200), ann=F, axes=F) #graph
+axis(1, at=1:5, labels=c("MON","TUE","WED","THU","FRI")) #xlim
+axis(2, at=c(0,50,100,150,200)) #ylim
+title(main="FRUIT", col.main="red", xlab="DAY") #메인, x축 라벨
+title(ylab="PRICE", col.lab="blue") #y축 라벨
+```
+
+```{r}
+par(mfrow=c(1,3)) #그래프의 배치
+par(mgp=c(2,1,0)) #x,ylabel위치, x,ylim숫자 위치, x,ylim 위치
+par(oma=c(0,0,0,0)) #아래,왼쪽,위,오른쪽
+```
+###　
+한 그래프에 여러개의 선 그리기
+```{r,warning=F}
+v1 <- c(1,2,3,4,5)
+v2 <- c(5,4,3,2,1)
+v3 <- c(3,4,5,6,7)
+plot(v1,type="s",col="red",ylim=c(1,5))
+par(new=T) # 이 부분이 중복 허용 부분입니다
+plot(v2,type="o",col="blue",ylim=c(1,5),ann=F,axes=F)
+par(new=T) # 이 부분이 중복 허용 부분입니다
+plot(v3,type="l",col="green",ann=F,axes=F)
+
+#더 정확하게 -> 위 방법은 축의 범위가 다르지만 겹치게 되어있어 오류가 있다.
+plot(v1,type="s", col="red", ylim=c(1,10))
+lines(v2,type="l",col="blue",ylim=c(1,5))
+lines(v3,type="l", col="green",ylim=c(1,5))
+legend(4,9,c("v1","v2","v3"),cex=0.5,col=c("red","blue","green"),lty=1)
+```
+
+
+범례 추가하기
+ legend(x 축 위치 , y 축 위치,내용 , cex=글자크기 , col =색상 , pch=크기 , lty=선모양)
+
+
+```{r,warning=F}
+x <- c(5,7,7,6,1)
+plot(x,type="o",ylim=c(0,8),col="red",ann=F,axes=F)
+axis(1,at=1:5,labels=c("A","B","C","D","F"))
+axis(2,at=seq(0,8,2))
+title(main="학점별 학생수", col.main="red", xlab="학점(점)")
+title(ylab="학생수(명)", col.lab="blue")
+```
+
+
+
+**barplot( ) : 막대 그래프 그리기**
+
+인수 | 기능
+------------|-----------------------------------
+angle,density,col | 막대를 칠하는 선분의 각도, 선분의 수, 선분의 색을 지정합니다
+legend | 오른쪽 상단에 범례를 그립니다
+names  | 각 막대의 라벨을 정하는 문자열 벡터를 지정합니다
+width  | 각 막대의 상대적인 폭을 벡터로 지정합니다
+space  | 각 막대 사이의 간격을 지정합니다
+beside | TRUE 를 지정하면 각각의 값마다 막대를 그립니다
+horiz  | TRUE 를 지정하면 막대를 옆으로 눕혀서 그립니다
+
+***
+
+barplot
+```{r}
+x <- c(1,2,3,4,5)
+barplot(x)
+barplot(x,horiz=T)
+
+x <- matrix(c(5,4,3,2),2,2)
+barplot(x, beside=T, names=c(5,3), col=c("green","yellow"))
+barplot(x, names=c(5,3), col=c("green","yellow"), ylim=c(0,12))
+
+v1 <- c(100,120,140,160,180)
+v2 <- c(120,130,150,140,170)
+v3 <- c(140,170,120,110,160)
+qty <- data.frame(BANANA=v1,CHERRY=v2,ORANGE=v3)
+
+barplot(as.matrix(qty), beside=T, col=rainbow(nrow(qty)), main="Fruit's Sales QTY", names.arg=c("바나나","체리","오렌지"))
+legend(14,100,c("MON","TUE","WED","THU","FRI"),cex=0.8, fill=rainbow(nrow(qty)))
+```
+
+히스토그램
+```{r}
+height <- c(182,175,167,172,163,178,181,166,159,155)
+hist(height, main="Histogramofheight")
+x <- height
+x <- data.frame('height'=x,'xname'=c("김","이","박","최","채","하","윤","민","지","강"))
+
+```
+
+파이차트
+
+인 수  |  기 능
+------------|----------------------------------
+angle,density,col | pie 부분을 구성하는 각도(angle) , 수 (density), 색상(col) 을 지정합니다.
+labels | 각 pie 부분의 이름을 지정하는 문자벡터를 지정합니다.
+radius | 원형의 크기를 지정합니다
+clockwise | 시계방향(T)으로 회전할지 반 시계방향(F)으로 회전할지 지정. 기본은 반시계임
+init.angle | 시작되는 지점의 각도지정
+
+```{r,warning=F}
+p1 <- c(10,20,30,40)
+pie(p1,radius=1)
+pie(p1,radius=1, init.angle=90, clockwise=T)
+pie(p1,radius=1, init.angle=90, col=rainbow(length(p1)), labels=c("Week1", "Week2","Week3","Week4"))
+legend(1,1,c("Week1","Week2","Week3","Week4"), fill=rainbow(length(p1)))
+
+label <- c("Week1","Week2","Week3","Week4")
+label <- paste(label,"\n",p1/sum(p1)*100,"%")
+pie(p1, radius=1, init.angle=90, col=rainbow(length(p1)), labels=label)
+```
+
+pie3D
+```{r}
+#install.packages("plotrix")
+library(plotrix)
+p1 <- c(10,20,30,40,50)
+f_day <- round(p1/sum(p1)*100,1)
+f_label <- paste(f_day,"%")
+pie3D(p1,main="3D Pie Chart",col=rainbow(length(p1)), cex=0.5,labels=f_label,explode=0.05)
+#explode=조각사이 틈의 크기
+legend(0.5,1,c("MON","TUE","WED","THU","FRI"),cex=0.6, fill=rainbow(length(p1)))
+```
+
+boxplot()
+
+옵션  | 의미
+------|---------------------------------
+col   | 박스 내부의 색깔을 지정합니다.
+names | 각 막대의 라벨을 지정할 문자벡터를 지정합니다.
+range | 박스의 끝에서 수염까지의 길이를 지정합니다. 기본은 1.5 입니다
+width | 박스의 폭을 지정합니다
+notch | true 로 지정할 경우 상자의 허리 부분을 가늘게 표시합니다.
+horizontal | true 로 지정하면 상자를 수평으로 그립니다. 아래부터 차례로 나열됩니다
+
+```{r}
+v1 <- c(10,12,15,11,20)
+v2 <- c(5,7,15,8,9)
+v3 <- c(11,20,15,18,13)
+boxplot(v1,v2,v3,col=c("blue","yellow","pink"), names=c("Blue","Yellow","Pink"), horizontal=T)
+```
+
+###　
+###저 수준 작도 함수 사용하기
+
+
+도 형  | 함 수
+-------|--------------
+점     | points( )
+직선   | lines( ) , segments( ) , abline( )
+격자   | grid( )
+화살표 | arrows( )
+직사각형 | rect( )
+문자, 테두리문자, 제목   | text( ) , mtext( ) , title( )
+테두리와 축 | box( ) , axis( )
+범례   | legend( )
+다각형 | polygon( )
+
+```{r}
+v1 <- c(1,10,5,9,3)
+plot(v1, type="o",ylim=c(1,10),xlim=c(1,10))
+abline(1,2,col="red")
+lines(4,8, col="blue")
+plot(v1, type="o",ylim=c(1,20),xlim=c(1,20))
+plot(v1, type="o",ylim=c(1,30),xlim=c(1,30))
+plot(v1, type="o",ylim=c(1,4),xlim=c(1,4))
+?abline
+abline(h=2,v=2)
+
+test <- matrix(c(1,2,3,4,5,6,7,8,9,10),ncol=2)
+colnames(test) <- c('x','y')
+rownames(test) <- c(1:5)
+plot(test,xlim=c(1,20),ylim=c(1,20), type="b")
+lines(1:10,c(10:5,6:9))
+abline(a=10, b=1)
+
+plot(c(1,2,3,4,5),xlim=c(1,5),ylim=c(1,5))
+abline(a=2,b=1)
+
+#?polygon
+n <- 100
+xx <- c(0:n, n:0)
+yy <- c(c(0, cumsum(stats::rnorm(n))), rev(c(0, cumsum(stats::rnorm(n)))))
+plot   (xx, yy, type = "n", xlab = "Time", ylab = "Distance")
+polygon(xx, yy, col = "gray", border = "red")
+title("Distance Between Brownian Motions")
+
+```
+
+
