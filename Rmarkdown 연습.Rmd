@@ -1,0 +1,79 @@
+---
+title: "ex markdown"
+author: "이재서"
+date: "2016년 8월 1일"
+output: html_document
+---
+#Title1
+##Title2
+###Title3
+
+__Bold__ not Bold **Bold**
+
+image : ![](C:\\r_temp\\r_temp\\겨스님.png)
+
+줄긋기
+
+***
+
+>black quote
+
+* unordered list
+* item
+    + sub-item1
+    + sub-item2
+1. ordered list
+2. item2
+    + sub-item1
+    + sub-item2
+
+
+테이블 만들기
+
+Table Header | Second Header
+-------------|--------------
+Table Cell   | Cell2
+Cell3        | Cell4
+
+
+```{r}
+x <- 1:12;x
+class(x)
+
+```
+
+***
+
+eval=T : 코드와 아웃풋 둘다 출력된다.
+```{r, eval=T}
+dim(x) <- c(3,4)
+class(x)
+```
+eval=F : 코드만 출력되고 아웃풋은 출력되지 않는다.
+```{r, eval=F}
+dim(x) <- c(3,4)
+class(x)
+```
+echo=T : 코드와 아웃풋 둘다 출력된다.
+```{r, echo=T}
+x <- c(1,2)
+dim(x) <- c(2,1)
+class(x)
+```
+echo=F : 아웃풋만 출력되고 코드는 출력되지 않는다.
+```{r, echo=F}
+x <- c(1,2)
+dim(x) <- c(2,1)
+class(x)
+```
+
+어떤효과가 있는지 모르겠다 | 기본값 표시
+```{r, tidy=F, cache=F, fig.width=7, fig.height=7}
+
+```
+
+
+***
+
+
+
