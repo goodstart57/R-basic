@@ -1,0 +1,233 @@
+---
+title: "ggplot"
+author: "이재서"
+date: "2016년 8월 4일"
+output: html_document
+---
+###　
+###ggplot
+```{r,message=F}
+#install.packages("ggplot2") #by Hadley Wickham
+library(ggplot2)
+```
+
+※geom_bar
+```{r}
+korean <- read.table("학생별국어성적_new.txt",header=T,sep=",")
+korean
+
+ggplot(korean, aes(x=이름, y=점수)) + geom_point()
+ggplot(korean, aes(x=이름, y=점수)) + geom_bar(stat="identity") #기본
+```
+
+geom_bar(stat="", _position_="_____" | 　
+----|----------
+"stack" | 누적
+"dodge" | 옆으로
+"fill"  | 비율 누적
+
+```{r}
+gg <- ggplot(korean, aes(x=이름,y=점수)) + geom_bar(stat="identity", fill="green", color="red")
+gg  <- gg + theme(axis.text.x=element_text(angle=45,hjust=1, vjust=1, color="blue",size=8))
+```
+※geom_text
+※theme
+```{r, warning=F}
+score_kem <- read.csv("학생별과목별성적_국영수_new.csv",header=T)
+library(plyr)
+sort_kem <- arrange(score_kem,이름,과목)
+sort_kem2 <- ddply(sort_kem,"이름",transform,누적합계=cumsum(점수))
+sort_kem3 <- ddply(sort_kem2,"이름",transform, pos=cumsum(점수)-0.5*(점수))
+
+ggplot(sort_kem3, aes(x=이름, y=점수, fill=과목)) +
+geom_bar(stat="identity") +
+geom_text(aes(y=pos, label=paste(점수,"점")), color="black", size=3) + 
+guides(fill=guide_legend(reverse=T)) +
+theme(axis.text.x=element_text(angle=45, hjust=1, vjust=1, color="black", size=8))
+```
+
+실습문제
+```{r,warning=F}
+BOD
+ggplot(BOD, aes(x=Time, y=demand)) +
+geom_bar(stat="identity")
+
+ggplot(BOD, aes(x=factor(Time), y=demand)) +
+geom_bar(stat="identity", fill="yellow", color="blue") + 
+theme(axis.text.x=element_text())
+```
+
+※RColorBrewer
+```{r,warning=F, message=F}
+library(plyr)
+cab <- read.table("cabbage_exp.txt",header=T)
+sort_cab <- arrange(cab, Date, Cultivar)
+ggplot(sort_cab, aes(x=Date, y=Weight, fill=Cultivar)) +
+  geom_bar(stat="identity", position="dodge")
+
+#install.packages("RColorBrewer")
+library(RColorBrewer)
+ggplot(sort_cab, aes(x=Date, y=Weight, fill=Cultivar)) +
+  geom_bar(stat="identity", position="dodge", color="black") +
+  scale_fill_brewer(palette="Pastel1")
+  scale_fill_brewer(palette="Accent")
+
+ggplot(sort_cab, aes(x=Date, y=Weight, fill=Cultivar)) +
+  geom_bar(stat="identity") +
+  guides(fill=guide_legend(reverse=T))
+
+```
+
+※guides
+```{r,warning=F}
+dat <- data.frame(x = 1:5, y = 1:5, p = 1:5, q = factor(1:5), r = factor(1:5))
+p <- ggplot(dat, aes(x, y, colour = p, size = q, shape = r)) + geom_point()
+p + guides(colour = "colorbar", size = "legend", shape = "legend")
+p + guides(colour = guide_colorbar(), size = guide_legend(), shape = guide_legend())
+p +
+ scale_colour_continuous(guide = "colorbar") +
+ scale_size_discrete(guide = "legend") +
+ scale_shape(guide = "legend")
+
+```
+
+※ggtitle
+```{r, warning=F}
+#install.packages("MASS")
+library(MASS)
+nine <- ggplot(Cars93, aes(x=Type)) + geom_bar(stat="count", fill="white", color="black") + ggtitle("Bar Chart of Frequency by Car Type")
+
+sort_Cars93 <- arrange(Cars93, Type, Origin)
+ten <- ggplot(sort_Cars93, aes(x=Type, fill=Origin)) + geom_bar(stat="count", position="dodge", color="Black") + ggtitle("Bar Chart of Frequency by Car Type")
+ten + scale_fill_brewer(palette="Blues")
+RColorBrewer::display.brewer.all()
+```
+
+※geom_segment()
+```{r, warning=F}
+score <- read.table("학생별전체성적_new.txt", header=T, sep=",")
+score[,c("이름","영어")]
+ggplot(score, aes(x=영어, y=reorder(이름,영어))) +
+  geom_point(size=6) +
+  theme_bw() + ##배경 하얗게
+  theme(panel.grid.major.x=element_blank(), #배경 뒤에 격자선
+        panel.grid.minor.x=element_blank(),
+        panel.grid.major.y=element_line(linetype="dashed", color="red"))
+
+ggplot(score, aes(x=영어, y=reorder(이름,영어))) +
+  geom_segment(aes(yend=이름), xend=0, color="blue") +
+  geom_point(size=6, color="green") +
+  theme_bw() +
+  theme(panel.grid.major.y=element_blank())
+```
+
+실습문제
+```{r}
+ggplot(score, aes(국어, reorder(이름,국어))) +
+  geom_point(size=6, color="black") +
+  theme_bw() +
+  theme(panel.grid.major.y=element_line(linetype="dashed", color="red"),
+        panel.grid.major.x=element_line(color="green"))
+```
+
+```{r}
+test <- cbind(No=c(1:150),iris)
+ggplot(test, aes(No, Petal.Length)) +
+  geom_point(size=3, color="gold") +
+  geom_segment(aes(xend=No,yend=max(Petal.Length)), color="yellow" )
+```
+
+
+※scale_color_manual
+※labs
+```{r}
+#install.packages("gridExtra")
+library(gridExtra)
+library(RColorBrewer)
+v_mt <- mtcars
+
+ggplot(v_mt, aes(x=hp, y=mpg)) +
+  geom_point(aes(shape=factor(am), color=factor(am), size=wt)) +
+  scale_color_brewer(palette="Pastel2")
+  scale_color_manual(values=c("red","green"))
+
+  
+##stoke쓸려면 shape=21으로 내부색 fill 외부색 color지정
+ggplot(v_mt, aes(x=hp, y=mpg), stroke=10) +
+  geom_point(shape=21, size=3, color="black", fill="red", stroke=3) +
+  geom_line() +
+  labs(x="마력", y="연비(mile/gallon)")
+
+##stroke 다른 예
+sizes <- expand.grid(size = (0:3) * 2, stroke = (0:3) * 2)
+ggplot(sizes, aes(size, stroke, size = size, stroke = stroke)) + 
+  geom_abline(slope = -1, intercept = 6, colour = "white", size = 6) + 
+  geom_point(shape = 21, fill = "red") +
+  scale_size_identity()
+```
+
+```{r,warning=F}
+Cars93
+ggplot(Cars93, aes(x=EngineSize, y=MPG.highway)) +
+  geom_point(size=3, shape=15, color="blue")
+
+ggplot(Cars93, aes(x=Weight, y=MPG.highway, color=Type)) +
+  geom_point() +
+  ggtitle("Scatter Plot by Type, using different Colours")
+
+ggplot(Cars93, aes(x=Weight, y=MPG.highway, shape=Type)) +
+  geom_point() +
+  ggtitle("Scatter Plot by Type, using different Colours")
+```
+
+※geom_line()
+```{r}
+three <- read.csv("학생별과목별성적_3기_3명.csv",header=T)
+ggplot(three, aes(x=과목, y=점수, color=이름, group=이름, fill=이름)) +
+  geom_line() +geom_point(shape=22, size=6)
+```
+
+실습문제
+```{r}
+BOD
+ggplot(BOD, aes(x=Time, y=demand)) + ylim(0,20) +
+  geom_point(color="violet",aes(size=demand)) +
+  geom_line() +
+  labs(x="시간", y="평균요구건수(개)")
+```
+
+
+※geom_area
+※alpha : 투명도 조절
+```{r, warning=F}
+dis <- read.csv("1군전염병발병현황_년도별.csv",stringsAsFactors=F)
+ggplot(dis, aes(x=년도별, y=장티푸스, group=1)) + geom_line() +
+  theme(axis.text.x=element_text(angle=45, hjust=1))
+
+ggplot(dis, aes(x=년도별, y=장티푸스, group=1)) + geom_area(fill="aquamarine", color="red", alpha=0.4)
+
+ggplot(dis, aes(x=년도별, y=장티푸스, group=1)) + geom_area(fill="aquamarine", alpha=0.4) + geom_line()
+```
+
+여러가지 배경
+```{r}
+test <- ggplot(dis, aes(x=년도별, y=장티푸스, group=1)) + geom_area(fill="aquamarine", alpha=0.4) + geom_line()
+
+test + theme_bw()
+
+test + theme_classic()
+
+test + theme_dark()
+
+test + theme_get()
+
+test + theme_gray()
+
+test + theme_grey()
+
+test + theme_light()
+
+test + theme_linedraw()
+
+test + theme_minimal()
+```
