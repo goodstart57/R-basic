@@ -1,0 +1,90 @@
+---
+title: "성형수술 부작용 키워드 분석"
+author: "이재서"
+date: "2016년 7월 30일"
+output: html_document
+---
+
+필요한 **패키지** 불러오기
+```{r, warning=F, message=F}
+library(KoNLP)
+library(wordcloud)
+library(stringr)
+library(RColorBrewer)
+```
+
+
+**명사**만 불러오기
+```{r, warning=F}
+plastic <- readLines("remake2.txt")
+plastic2 <- sapply(plastic, extractNoun, USE.NAMES=F)
+
+head(unlist(plastic2),30)
+```
+***
+
+**불필요한 단어** 제거
+```{r, warning=F}
+plastic3 <- unlist(plastic2)
+plastic3 <- str_replace_all(plastic3,"[^[:alpha:]]","")
+plastic3 <- gsub("\\d+","",plastic3)
+plastic3 <- gsub(" ","",plastic3)
+plastic3 <- Filter(function(x) {nchar(x) >= 2}, plastic3)
+head(unlist(plastic3),30)
+```
+
+***
+
+명사만 남은 파일 다른 이름으로 저장 후 테이블로 불러오기
+```{r, warning=F}
+write(unlist(plastic3), "remake2_2.txt")
+pla <- read.table("remake2_2.txt")
+
+```
+
+단어들의 빈도수 확인
+```{r, warning=F}
+nrow(pla)
+wordcount <- table(pla)
+head(sort(wordcount, decreasing=T), 30)
+```
+
+필요없는 단어 다시 정리
+```{r, warning=F}
+pla_del <- readLines('remake2_deln.txt')
+for(i in 1:length(pla_del)) {
+  plastic3 <- gsub((pla_del[i]),"",plastic3)
+}
+plastic3 <- Filter(function(x) {nchar(x) >= 2}, plastic3)
+head(unlist(plastic3),30)
+```
+
+명사만 남은 파일 다른 이름으로 저장 후 테이블로 불러오기
+```{r, warning=F}
+write(unlist(plastic3), "remake2_2.txt")
+pla <- read.table("remake2_2.txt")
+
+```
+
+단어들의 빈도수 확인
+```{r, warning=F}
+nrow(pla)
+wordcount <- table(pla)
+head(sort(wordcount, decreasing=T), 30)
+```
+
+
+
+
+원하는 색깔 지정
+```{r, warning=F}
+palete <- brewer.pal(9,"Set1")
+```
+
+워드 클라우드
+```{r, warning=F}
+wordcloud(names(wordcount), freq=wordcount, scale=c(2,0.5), rot.per=0.25, min.freq=2, random.order=F, random.color=T, colors=palete)
+legend(0.3, 1, "성형수술 부작용 키워드 분석", cex=0.8, fill=NA, border=NA, bg="White", text.col="red", text.font=2, box.col="red")
+```
+
+
