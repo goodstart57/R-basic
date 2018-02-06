@@ -1,0 +1,78 @@
+---
+title: "Venn"
+author: "이재서"
+date: "2016년 8월 21일"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+```{r}
+##install.packages("venneuler")
+library(venneuler)
+```
+
+<br>
+
+```{r}
+# define labels
+labels <- c("Happy", "Bday")
+# define colors
+colors <- c("#7709d2","#64D209")
+# name colors with labels
+names(colors) <- labels
+```
+
+<br>
+
+```{r}
+# some toy data    IMPORTANT PART IS THAT 
+mat <- matrix(c(3000,1000,10,470), nrow=2, ncol=2)
+colnames(mat) <- labels
+rownames(mat) <- labels
+
+
+
+make_venn <- function(dat, title="",fill_cols=NULL
+                      , alpha=.7, title_font=1){
+  vv <- venneuler::venneuler(dat)
+  if (!is.null(fill_cols)){
+    plot(vv, main=title, font.main = title_font
+    , col=fill_cols[match(vv$labels, names(colors))], alpha=alpha )
+  } else {
+    plot(vv, main=title, font.main = title_font, alpha=alpha)
+  }
+}
+
+
+
+
+make_dat <- function(dat){
+ if (is.matrix(dat)) {
+# self-datcuring
+      dg <- diag(dat)
+    
+# co-tags
+      nm <-  nn <-  matrix(nrow=nrow(dat),ncol=nrow(dat))
+    
+    
+# get names and values from lower.tri
+      for (i in seq_along(rownames(dat))){
+        for (j in seq_along(rownames(dat))){
+          if (i!=j) nm[i,j] <- paste(rownames(dat)[i],rownames(dat)[j], sep="&")
+          if (i!=j) nn[i,j] <- dat[i,j]
+        }
+      }
+      nn <- na.omit(as.vector(nn))
+      nm <- na.omit(as.vector(nm))
+      names(nn) <- nm
+      c(dg,nn)
+  } else if (any(grepl("&",names(dat)))){
+      dat
+  } else stop("Data format of dat object is incorrect\n\tEither is not a matrix or\n\tnames do not contain '&' for co-tags" )
+}
+
+
+make_venn(make_dat(mat),title="Happy Birthday Venn!" ,fill_cols=colors, title_font=2)
+
+```
+
