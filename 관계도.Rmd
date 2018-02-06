@@ -1,0 +1,174 @@
+---
+title: "igraph"
+author: "이재서"
+date: "2016년 8월 4일"
+output: html_document
+---
+
+###관계도
+```{r}
+#install.packages("igraph")
+library(igraph)
+
+g1 <- graph(c(1,2,2,3,2,4,1,4,5,5,3,6))
+plot(g1)
+str(g1)
+```
+
+```{r}
+name <- c('서진수 대표이사','일지매 부장','김유신 과장','손흥민 대리','노정호 대리', '이순신 부장','유관순 과장','신사임당 대리','강감찬 부장','광개토 과장','정몽주 대리')
+pemp <- c('서진수 대표이사','서진수 대표이사','일지매 부장','김유신 과장','김유신 과장', '서진수 대표이사','이순신 부장', '유관순 과장','서진수 대표이사', '강감찬 부장','광개토 과장')
+emp <- data.frame(이름=name,상사이름=pemp);emp
+
+g <- graph.data.frame(emp,directed=T)
+plot(g,layout=layout.fruchterman.reingold,vertex.size=8,edge.arrow.size=0.5)
+g3 <- graph.data.frame(emp,directed=F) 
+plot(g3,layout=layout.fruchterman.reingold,vertex.size=8,  edge.arrow.size=0.5 , vertex.label=NA) ##이름이 안나오게 출력
+```
+
+
+###__위 옵션에서 사용된 파라미터 값 정리__
+####**layout 관련 값 **
+layout.random , layout.cicle , layout.fruchterman.reingold , layout.kamada.kawai, layout.sprint , layout.lgl , layout.mds , layout.svd
+
+####**선 관련 값**
+
+파라미터 | 의 미 | 파라미터 | 의 미
+-------|---------------|-------|--------------
+edge.color |선의 색상 | edge.lty | 선 유형.solid , dashed , dotted
+edge.width | 선의 폭 | edge.label.family | 선 종류.serif , sans , mono
+edge.arrow.size | 화살의 크기 | edge.label.font | 선 레이블 형, 1:일반, 2:볼드,3:이탤릭, 4. 볼드 이텔릭
+edge.arrow.width | 화살의 폭 | edge.arrow.mode | 화살 머리 유형
+edge.label.color | 선 레이블 색상 |　
+
+####**점 관련 값**
+
+파라미터 | 의 미 | 파라미터 | 의 미
+-------|---------------|-------|--------------
+vertex.size | 점 크기 지정 | vertex.color | 점의 색 지정
+vertex.frame.color | 점 윤곽의 색 | vertex.shape | 점의 형태
+vertex.label | 점 레이블 | vertex.label.family | 점 레이블 종류
+vertex.label.font | 폰트 | vertex.label.cex | 점 레이블 크기
+vertex.lebel.dist | 점 중심과의 거리 | vertex.label.degree | 점 레이블 방향
+vertex.label.color | 점 레이블 색상
+
+
+
+###군집분석
+```{r}
+#install.packages("devtools")
+library(devtools)
+#install_github("christophergandrud/d3Network")
+#install.packages("RCurl")
+library(RCurl)
+library(d3Network) 
+
+name <- c('Angela Bassett','Jessica Lange','Winona Ryder','Michelle Pfeiffer', 'Whoopi Goldberg','Emma Thompson','Julia Roberts','Sharon Stone', 'Meryl Streep', 'Susan Sarandon','Nicole Kidman')
+pemp <- c('Angela Bassett','Angela Bassett','Jessica Lange','Winona Ryder', 'Winona Ryder', 'Angela Bassett','Emma Thompson', 'Julia Roberts', 'Angela Bassett', 'Meryl Streep','Susan Sarandon')
+emp <- data.frame(이름=name,상사이름=pemp)
+d3SimpleNetwork(emp, width=600, height=600, fontsize=15, file="d3.html")
+```
+
+```{r}
+g <- read.csv("군집분석.csv",head=T)
+graph <- data.frame(학생=g$학생,교수=g$교수)
+g<-graph.data.frame(graph,directed=T) ##directed=T는 방향성이 있는 데이터로 표
+plot(g,layout=layout.fruchterman.reingold,vertex.size=2, edge.arrow.size=0.5, vertex.color="green",vertex.label=NA)
+
+#모양바꿔서 출력하기
+plot(g,layout=layout.kamada.kawai,vertex.size=2,edge.arrow.size=0.5, vertex.label=NA)
+```
+
+학생과 교수의 색상과 크기를 구분
+```{r,warning=F}
+library(stringr)
+g<-read.csv("군집분석.csv",head=T)
+graph <- data.frame(학생=g$학생,교수=g$교수)
+g <- graph.data.frame(graph,directed=T)
+g
+gubun1 <- V(g)$name
+gubun1
+gubun <- str_sub(gubun1,start=1,end=1)
+gubun
+
+#학생일 경우 컬러를 red로 하고 교수님일 경우 green 으로 출력하는 코드
+colors <- c()
+for ( i in 1:length(gubun)) { if (gubun[i] == 'S' ) { colors <- c(colors,"red") } else { colors <- c(colors,"green") } }
+
+# 학생일 경우 점의 크기를 2 로 , 교수님일 경우 점의 크기를 6으로 하는 코드
+sizes <- c()
+for ( i in 1:length(gubun)) { if (gubun[i] == 'S' ) { sizes <- c(sizes,2) } else { sizes <- c(sizes,6) } }
+plot(g,layout=layout.fruchterman.reingold,vertex.size=sizes,edge.arrow.size=0.5, vertex.color=colors)
+
+
+# 이름 없애기 – 위 그래프에서 이름부분이 너무 지저분해서 이름을 제거하고 출력하기
+plot(g,layout=layout.fruchterman.reingold,vertex.size=sizes,edge.arrow.size=0.5, vertex.color=colors,vertex.label=NA)
+
+# 화살표 표시 없게 만들기
+plot(g,layout=layout.fruchterman.reingold,vertex.size=sizes,edge.arrow.size=0, vertex.color=colors,vertex.label=NA)
+
+# 학생과 교수의 도형 모양 다르게 하고 화살표 없애고 색깔도 다르게 하기
+plot(g,layout=layout.kamada.kawai,vertex.size=sizes,edge.arrow.size=0, vertex.color=colors,vertex.label=NA)
+
+# 아래 코드는 학생일 경우 모양을 square 로 하고 교수님일 경우 점의 모양을 circle 로 하는 코드임
+shapes <- c()
+for ( i in 1:length(gubun)) {
+if (gubun[i] == 'S' ) {
+shapes <- c(shapes,"circle") }
+else {
+shapes <- c(shapes,"square") }
+}
+plot(g,layout=layout.kamada.kawai,vertex.size=sizes,edge.arrow.size=0, vertex.color=colors,vertex.label=NA,vertex.shape=shapes)
+```
+
+```{r,warning=F}
+#d3Network( ) 패키지로 메르스 환자를 표시한 그림입니다.
+#install.packages("devtools")
+library(devtools)
+#install_github("christophergandrud/d3Network")
+library(RCurl)
+library(d3Network)
+virus1 <- read.csv("메르스전염현황.csv",header=T)
+d3SimpleNetwork(virus1,width=600,height=600,file="c:\\r_temp\\mers.html")
+```
+
+###treemap(나무지도) 활용하기 : 기준값을 정해 그 값을 가진 데이터들끼리 모아서 같은 면적으로 보여줌
+```{r,warning=F}
+#install.packages("treemap")
+library(treemap)
+total <- read.csv("학생시험결과_전체점수.csv",header=T, sep=",")
+total
+treemap(total,vSize="점수",index=c("점수","이름"))
+treemap(total,vSize="점수",index=c("조","이름"))
+treemap(total,vSize="점수",index=c("점수","조","이름"))
+```
+
+
+starts함수
+```{r}
+total <- read.table("학생별전체성적_new.txt",header=T,sep=",")
+total
+row.names(total)<- total$이름
+total <- total[,2:7];total
+stars(total,flip.labels=FALSE,draw.segment=FALSE,frame.plot=TRUE,full=TRUE, main="학생별 과목별 성적분석-STAR Chart" )
+
+#인덱스
+lab <- names(total)
+value <- table(lab)
+value
+pie(value,labels=lab, radius=0.1, cex=0.6, col=NA)
+
+##draw.segment=T
+stars(total,flip.labels=FALSE,draw.segment=T,frame.plot=TRUE,full=TRUE, main="학생별 과목별 성적분석-나이팅게일 챠트" )
+
+lab <- names(total)
+value <- table(lab)
+value
+color <- c("black","red","green","blue","cyan","purple")
+pie(value,labels=lab, col=color, radius=0.1, cex=0.6)
+
+#반원차트
+stars(total,flip.labels=FALSE,draw.segment=TRUE,frame.plot=TRUE,full=FALSE, main="학생별 과목별 분석 다이어그램-반원차트" )
+```
+
+
